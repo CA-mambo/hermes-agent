@@ -709,7 +709,23 @@ class MattermostAdapter(BasePlatformAdapter):
         # Config (env vars):
         #   MATTERMOST_REQUIRE_MENTION: Require @mention in channels (default: true)
         #   MATTERMOST_FREE_RESPONSE_CHANNELS: Channel IDs where bot responds without mention
+        #   MATTERMOST_ALLOWED_CHANNELS: If set, bot ONLY responds in these channels (whitelist)
         if channel_type_raw != "D":
+            # allowed_channels check (whitelist — must pass before other gating).
+            # When set, messages from channels NOT in this list are silently
+            # ignored, even if @mentioned.  DMs are already excluded above.
+            allowed_channels_raw = os.getenv("MATTERMOST_ALLOWED_CHANNELS", "")
+            if allowed_channels_raw:
+                allowed_channels = {
+                    ch.strip() for ch in allowed_channels_raw.split(",") if ch.strip()
+                }
+                if channel_id not in allowed_channels:
+                    logger.debug(
+                        "Mattermost: ignoring message in non-allowed channel: %s",
+                        channel_id,
+                    )
+                    return
+
             require_mention = os.getenv(
                 "MATTERMOST_REQUIRE_MENTION", "true"
             ).lower() not in ("false", "0", "no")

@@ -79,7 +79,8 @@ _EXTRA_ENV_KEYS = frozenset({
     "WHATSAPP_MODE", "WHATSAPP_ENABLED",
     "MATTERMOST_HOME_CHANNEL", "MATTERMOST_HOME_CHANNEL_NAME", "MATTERMOST_REPLY_MODE",
     "MATRIX_PASSWORD", "MATRIX_ENCRYPTION", "MATRIX_DEVICE_ID", "MATRIX_HOME_ROOM",
-    "MATRIX_REQUIRE_MENTION", "MATRIX_FREE_RESPONSE_ROOMS", "MATRIX_AUTO_THREAD", "MATRIX_DM_AUTO_THREAD",
+    "MATRIX_REQUIRE_MENTION", "MATRIX_FREE_RESPONSE_ROOMS", "MATRIX_ALLOWED_ROOMS",
+    "MATRIX_AUTO_THREAD", "MATRIX_DM_AUTO_THREAD",
     "MATRIX_RECOVERY_KEY",
     # Langfuse observability plugin — optional tuning keys + standard SDK vars.
     # Activation is via plugins.enabled (opt-in through `hermes plugins enable
@@ -1138,6 +1139,7 @@ DEFAULT_CONFIG = {
     "telegram": {
         "reactions": False,            # Add 👀/✅/❌ reactions to messages during processing
         "channel_prompts": {},         # Per-chat/topic ephemeral system prompts (topics inherit from parent group)
+        "allowed_chats": "",           # If set, bot ONLY responds in these group/supergroup chat IDs (whitelist)
     },
 
     # Mattermost platform settings (gateway mode)
@@ -2121,6 +2123,13 @@ OPTIONAL_ENV_VARS = {
         "password": False,
         "category": "messaging",
     },
+    "MATTERMOST_ALLOWED_CHANNELS": {
+        "description": "If set, Mattermost bot ONLY responds in these channel IDs (comma-separated whitelist; DMs exempt)",
+        "prompt": "Allowed channel IDs (comma-separated; blank = no restriction)",
+        "url": None,
+        "password": False,
+        "category": "messaging",
+    },
     "MATRIX_HOMESERVER": {
         "description": "Matrix homeserver URL (e.g. https://matrix.example.org)",
         "prompt": "Matrix homeserver URL",
@@ -2160,6 +2169,14 @@ OPTIONAL_ENV_VARS = {
     "MATRIX_FREE_RESPONSE_ROOMS": {
         "description": "Comma-separated Matrix room IDs where bot responds without @mention",
         "prompt": "Free-response room IDs (comma-separated)",
+        "url": None,
+        "password": False,
+        "category": "messaging",
+        "advanced": True,
+    },
+    "MATRIX_ALLOWED_ROOMS": {
+        "description": "If set, Matrix bot ONLY responds in these room IDs (comma-separated whitelist; DMs exempt)",
+        "prompt": "Allowed room IDs (comma-separated; blank = no restriction)",
         "url": None,
         "password": False,
         "category": "messaging",
